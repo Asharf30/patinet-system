@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Geist } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lip/utils";
-import { ThemeProvider } from "@/components/ui/theme-provdier";
+import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/theme-provdier";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
+      suppressHydrationWarning
       lang="en"
       className={cn("h-full", "antialiased", "font-sans", geist.variable)}
     >
@@ -23,10 +24,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           geist.variable,
         )}
       >
-        {/* <ThemeProvider attribute="class" defaultTheme="dark">
+        <ThemeProvider attribute="class" defaultTheme="dark">
           {children}
-        </ThemeProvider> */}
-        {children}
+        </ThemeProvider>
       </body>
     </html>
   );
