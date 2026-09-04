@@ -1,11 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
-import * as z from "zod"
-import { User, Mail, ChevronDown, Loader2, RotateCcw } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
+import {
+  User,
+  Mail,
+  ChevronDown,
+  Loader2,
+  RotateCcw,
+  HeartPulse,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   name: z
@@ -17,12 +24,12 @@ const formSchema = z.object({
     .string()
     .min(10, "يرجى إدخال رقم هاتف صحيح يتكون من 10 أرقام على الأقل.")
     .max(15, "رقم الهاتف طويل جداً."),
-})
+});
 
-type PatientFormValues = z.infer<typeof formSchema>
+type PatientFormValues = z.infer<typeof formSchema>;
 
 const PatientForm = () => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<PatientFormValues>({
     resolver: zodResolver(formSchema),
@@ -31,18 +38,18 @@ const PatientForm = () => {
       email: "",
       phone: "",
     },
-  })
+  });
 
   async function onSubmit(data: PatientFormValues) {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      console.log("البيانات المرسلة:", data)
+      console.log("البيانات المرسلة:", data);
       // محاكاة الإرسال
-      await new Promise((resolve) => setTimeout(resolve, 600))
+      await new Promise((resolve) => setTimeout(resolve, 600));
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -51,15 +58,16 @@ const PatientForm = () => {
       name: "",
       email: "",
       phone: "",
-    })
-  }
+    });
+  };
 
   return (
     <div className="w-full" dir="rtl">
       {/* قسم الترحيب والعنوان */}
       <section className="mb-8 space-y-2 text-right">
-        <h1 className="text-32-bold md:text-36-bold text-white flex items-center gap-2">
-          أهلاً بك <span className="inline-block">👋</span>
+        <h1 className="text-32-bold md:text-36-bold text-white flex items-center gap-6">
+          <span>أهلاً بك</span>
+          <HeartPulse className="size-8 text-green-500 shrink-0" />
         </h1>
         <p className="text-dark-700 text-sm md:text-base font-normal">
           احجز موعدك الأول.
@@ -184,7 +192,7 @@ const PatientForm = () => {
                     id="phone"
                     type="tel"
                     dir="ltr"
-                    placeholder="010 1234 5678"
+                    placeholder="10 1234 5678"
                     autoComplete="tel"
                     className="w-full bg-transparent text-sm text-white placeholder:text-dark-600 outline-none text-left"
                   />
@@ -204,7 +212,7 @@ const PatientForm = () => {
           <Button
             type="submit"
             disabled={isLoading}
-            className="flex-1 h-11 rounded-md bg-green-500 hover:bg-green-500/90 text-white font-medium text-base transition-colors shadow-none cursor-pointer"
+            className="flex-1 h-11 rounded-md bg-green-500 hover:bg-green-400 text-white font-medium text-base cursor-pointer transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lime-500 active:translate-y-0 active:scale-[0.99]"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -220,7 +228,7 @@ const PatientForm = () => {
             type="button"
             variant="outline"
             onClick={handleReset}
-            className="h-11 px-4 rounded-md border border-dark-500 bg-dark-400 hover:bg-dark-500/60 text-dark-700 hover:text-white transition-colors cursor-pointer flex items-center gap-2"
+            className="h-11 px-4 rounded-md border border-dark-500 bg-dark-400 text-dark-700 hover:text-white hover:border-zinc-500 hover:bg-dark-500/50 cursor-pointer transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_0_15px_rgba(255,255,255,0.12)] active:translate-y-0 active:scale-[0.99] flex items-center gap-2"
             title="إعادة تعيين جميع الحقول"
           >
             <RotateCcw className="size-4" />
@@ -229,7 +237,7 @@ const PatientForm = () => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default PatientForm
+export default PatientForm;
