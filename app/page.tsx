@@ -4,6 +4,8 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="flex h-screen max-h-screen">
+      {/* pesskey , Verification */}
+
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-\[496px\]">
           <Image
@@ -19,16 +21,18 @@ export default function Home() {
             <p className="justify-items-end text-dark-600 xl:text-left">
               © 2026 CarePluse
             </p>
-            <Link href="/?admin=true" className="text-green-500">Admin</Link>
+            <Link href="/?admin=true" className="text-green-500">
+              Admin
+            </Link>
           </div>
         </div>
       </section>
       <Image
-      src="/icons/bording.avif"
-      alt="image"
-      width={1000}
-      height={1000}
-      className="max-w-[50%] side-img"
+        src="/icons/bording.jpg"
+        alt="image"
+        width={1000}
+        height={1000}
+        className="max-w-[50%] side-img"
       />
     </div>
   );
