@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Controller,
   type Control,
@@ -60,42 +60,114 @@ export enum FormFieldType {
 }
 
 // ==========================================
-// 2. REUSABLE COUNTRY DATA & SELECTOR
+// 2. REUSABLE COUNTRY DATA & HELPERS
 // ==========================================
 export interface CountryOption {
   code: string;
   name: string;
   flag: string;
+  flagUrl: string;
   dialCode: string;
 }
 
 export const DEFAULT_COUNTRIES: CountryOption[] = [
-  { code: "EG", name: "مصر (Egypt)", flag: "🇪🇬", dialCode: "+20" },
-  { code: "SA", name: "السعودية (Saudi Arabia)", flag: "🇸🇦", dialCode: "+966" },
-  { code: "AE", name: "الإمارات (UAE)", flag: "🇦🇪", dialCode: "+971" },
-  { code: "KW", name: "الكويت (Kuwait)", flag: "🇰🇼", dialCode: "+965" },
-  { code: "QA", name: "قطر (Qatar)", flag: "🇶🇦", dialCode: "+974" },
-  { code: "BH", name: "البحرين (Bahrain)", flag: "🇧🇭", dialCode: "+973" },
-  { code: "OM", name: "عُمان (Oman)", flag: "🇴🇲", dialCode: "+968" },
-  { code: "JO", name: "الأردن (Jordan)", flag: "🇯🇴", dialCode: "+962" },
-  { code: "LB", name: "لبنان (Lebanon)", flag: "🇱🇧", dialCode: "+961" },
-  { code: "IQ", name: "العراق (Iraq)", flag: "🇮🇶", dialCode: "+964" },
-  { code: "PS", name: "فلسطين (Palestine)", flag: "🇵🇸", dialCode: "+970" },
-  { code: "SY", name: "سوريا (Syria)", flag: "🇸🇾", dialCode: "+963" },
-  { code: "YE", name: "اليمن (Yemen)", flag: "🇾🇪", dialCode: "+967" },
-  { code: "SD", name: "السودان (Sudan)", flag: "🇸🇩", dialCode: "+249" },
-  { code: "LY", name: "ليبيا (Libya)", flag: "🇱🇾", dialCode: "+218" },
-  { code: "TN", name: "تونس (Tunisia)", flag: "🇹🇳", dialCode: "+216" },
-  { code: "DZ", name: "الجزائر (Algeria)", flag: "🇩🇿", dialCode: "+213" },
-  { code: "MA", name: "المغرب (Morocco)", flag: "🇲🇦", dialCode: "+212" },
-  { code: "US", name: "الولايات المتحدة (USA)", flag: "🇺🇸", dialCode: "+1" },
-  { code: "GB", name: "المملكة المتحدة (UK)", flag: "🇬🇧", dialCode: "+44" },
-  { code: "CA", name: "كندا (Canada)", flag: "🇨🇦", dialCode: "+1" },
-  { code: "FR", name: "فرنسا (France)", flag: "🇫🇷", dialCode: "+33" },
-  { code: "DE", name: "ألمانيا (Germany)", flag: "🇩🇪", dialCode: "+49" },
-  { code: "TR", name: "تركيا (Turkey)", flag: "🇹🇷", dialCode: "+90" },
+  { code: "EG", name: "مصر (Egypt)", flag: "🇪🇬", flagUrl: "https://flagcdn.com/w40/eg.png", dialCode: "+20" },
+  { code: "SA", name: "السعودية (Saudi Arabia)", flag: "🇸🇦", flagUrl: "https://flagcdn.com/w40/sa.png", dialCode: "+966" },
+  { code: "AE", name: "الإمارات (UAE)", flag: "🇦🇪", flagUrl: "https://flagcdn.com/w40/ae.png", dialCode: "+971" },
+  { code: "KW", name: "الكويت (Kuwait)", flag: "🇰🇼", flagUrl: "https://flagcdn.com/w40/kw.png", dialCode: "+965" },
+  { code: "QA", name: "قطر (Qatar)", flag: "🇶🇦", flagUrl: "https://flagcdn.com/w40/qa.png", dialCode: "+974" },
+  { code: "BH", name: "البحرين (Bahrain)", flag: "🇧🇭", flagUrl: "https://flagcdn.com/w40/bh.png", dialCode: "+973" },
+  { code: "OM", name: "عُمان (Oman)", flag: "🇴🇲", flagUrl: "https://flagcdn.com/w40/om.png", dialCode: "+968" },
+  { code: "JO", name: "الأردن (Jordan)", flag: "🇯🇴", flagUrl: "https://flagcdn.com/w40/jo.png", dialCode: "+962" },
+  { code: "PS", name: "فلسطين (Palestine)", flag: "🇵🇸", flagUrl: "https://flagcdn.com/w40/ps.png", dialCode: "+970" },
+  { code: "LB", name: "لبنان (Lebanon)", flag: "🇱🇧", flagUrl: "https://flagcdn.com/w40/lb.png", dialCode: "+961" },
+  { code: "IQ", name: "العراق (Iraq)", flag: "🇮🇶", flagUrl: "https://flagcdn.com/w40/iq.png", dialCode: "+964" },
+  { code: "SY", name: "سوريا (Syria)", flag: "🇸🇾", flagUrl: "https://flagcdn.com/w40/sy.png", dialCode: "+963" },
+  { code: "YE", name: "اليمن (Yemen)", flag: "🇾🇪", flagUrl: "https://flagcdn.com/w40/ye.png", dialCode: "+967" },
+  { code: "SD", name: "السودان (Sudan)", flag: "🇸🇩", flagUrl: "https://flagcdn.com/w40/sd.png", dialCode: "+249" },
+  { code: "LY", name: "ليبيا (Libya)", flag: "🇱🇾", flagUrl: "https://flagcdn.com/w40/ly.png", dialCode: "+218" },
+  { code: "TN", name: "تونس (Tunisia)", flag: "🇹🇳", flagUrl: "https://flagcdn.com/w40/tn.png", dialCode: "+216" },
+  { code: "DZ", name: "الجزائر (Algeria)", flag: "🇩🇿", flagUrl: "https://flagcdn.com/w40/dz.png", dialCode: "+213" },
+  { code: "MA", name: "المغرب (Morocco)", flag: "🇲🇦", flagUrl: "https://flagcdn.com/w40/ma.png", dialCode: "+212" },
+  { code: "MR", name: "موريتانيا (Mauritania)", flag: "🇲🇷", flagUrl: "https://flagcdn.com/w40/mr.png", dialCode: "+222" },
+  { code: "SO", name: "الصومال (Somalia)", flag: "🇸🇴", flagUrl: "https://flagcdn.com/w40/so.png", dialCode: "+252" },
+  { code: "DJ", name: "جيبوتي (Djibouti)", flag: "🇩🇯", flagUrl: "https://flagcdn.com/w40/dj.png", dialCode: "+253" },
+  { code: "KM", name: "جزر القمر (Comoros)", flag: "🇰🇲", flagUrl: "https://flagcdn.com/w40/km.png", dialCode: "+269" },
+  { code: "US", name: "الولايات المتحدة (USA)", flag: "🇺🇸", flagUrl: "https://flagcdn.com/w40/us.png", dialCode: "+1" },
+  { code: "GB", name: "المملكة المتحدة (UK)", flag: "🇬🇧", flagUrl: "https://flagcdn.com/w40/gb.png", dialCode: "+44" },
+  { code: "CA", name: "كندا (Canada)", flag: "🇨🇦", flagUrl: "https://flagcdn.com/w40/ca.png", dialCode: "+1" },
+  { code: "FR", name: "فرنسا (France)", flag: "🇫🇷", flagUrl: "https://flagcdn.com/w40/fr.png", dialCode: "+33" },
+  { code: "DE", name: "ألمانيا (Germany)", flag: "🇩🇪", flagUrl: "https://flagcdn.com/w40/de.png", dialCode: "+49" },
+  { code: "IT", name: "إيطاليا (Italy)", flag: "🇮🇹", flagUrl: "https://flagcdn.com/w40/it.png", dialCode: "+39" },
+  { code: "ES", name: "إسبانيا (Spain)", flag: "🇪🇸", flagUrl: "https://flagcdn.com/w40/es.png", dialCode: "+34" },
+  { code: "TR", name: "تركيا (Turkey)", flag: "🇹🇷", flagUrl: "https://flagcdn.com/w40/tr.png", dialCode: "+90" },
+  { code: "RU", name: "روسيا (Russia)", flag: "🇷🇺", flagUrl: "https://flagcdn.com/w40/ru.png", dialCode: "+7" },
+  { code: "IN", name: "الهند (India)", flag: "🇮🇳", flagUrl: "https://flagcdn.com/w40/in.png", dialCode: "+91" },
+  { code: "PK", name: "باكستان (Pakistan)", flag: "🇵🇰", flagUrl: "https://flagcdn.com/w40/pk.png", dialCode: "+92" },
+  { code: "MY", name: "ماليزيا (Malaysia)", flag: "🇲🇾", flagUrl: "https://flagcdn.com/w40/my.png", dialCode: "+60" },
+  { code: "ID", name: "إندونيسيا (Indonesia)", flag: "🇮🇩", flagUrl: "https://flagcdn.com/w40/id.png", dialCode: "+62" },
+  { code: "CN", name: "الصين (China)", flag: "🇨🇳", flagUrl: "https://flagcdn.com/w40/cn.png", dialCode: "+86" },
+  { code: "JP", name: "اليابان (Japan)", flag: "🇯🇵", flagUrl: "https://flagcdn.com/w40/jp.png", dialCode: "+81" },
+  { code: "AU", name: "أستراليا (Australia)", flag: "🇦🇺", flagUrl: "https://flagcdn.com/w40/au.png", dialCode: "+61" },
+  { code: "BR", name: "البرازيل (Brazil)", flag: "🇧🇷", flagUrl: "https://flagcdn.com/w40/br.png", dialCode: "+55" },
 ];
 
+/**
+ * Finds a country by dial code (e.g. "+20" or "20" or "+966")
+ */
+export function findCountryByDialCode(
+  dialCode: string,
+  countries: CountryOption[] = DEFAULT_COUNTRIES
+): CountryOption | undefined {
+  const normalized = dialCode.startsWith("+") ? dialCode : `+${dialCode}`;
+  return countries.find((c) => c.dialCode === normalized);
+}
+
+/**
+ * Finds a country by 2-letter ISO code (e.g. "EG", "SA")
+ */
+export function findCountryByCode(
+  code: string,
+  countries: CountryOption[] = DEFAULT_COUNTRIES
+): CountryOption | undefined {
+  return countries.find((c) => c.code.toLowerCase() === code.toLowerCase());
+}
+
+// ==========================================
+// 3. REUSABLE COUNTRY FLAG IMAGE COMPONENT
+// ==========================================
+export function CountryFlag({
+  country,
+  className,
+}: {
+  country: CountryOption;
+  className?: string;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const flagUrl = country.flagUrl || `https://flagcdn.com/w40/${country.code.toLowerCase()}.png`;
+
+  return (
+    <span className={cn("inline-flex items-center justify-center shrink-0", className)}>
+      {!hasError ? (
+        <Image
+          src={flagUrl}
+          alt={country.name}
+          width={22}
+          height={15}
+          unoptimized
+          className="h-3.5 w-5 rounded-[2px] object-cover shadow-xs border border-dark-500/50 shrink-0"
+          onError={() => setHasError(true)}
+        />
+      ) : (
+        <span className="text-base leading-none select-none">{country.flag}</span>
+      )}
+    </span>
+  );
+}
+
+// ==========================================
+// 4. REUSABLE COUNTRY SELECTOR COMPONENT
+// ==========================================
 export interface CountrySelectorProps {
   selectedCountry: CountryOption;
   onSelectCountry: (country: CountryOption) => void;
@@ -119,34 +191,36 @@ export function CountrySelector({
         disabled={disabled}
         type="button"
         className={cn(
-          "ml-3 flex items-center gap-1.5 select-none shrink-0 border-l border-dark-500/60 pl-2.5 cursor-pointer outline-none hover:opacity-80 transition-opacity",
+          "ml-3 flex items-center gap-1.5 select-none shrink-0 border-l border-dark-500/60 pl-2.5 cursor-pointer outline-none hover:opacity-85 transition-opacity",
           disabled && "cursor-not-allowed opacity-50",
           className
         )}
         dir="ltr"
-        title="اختر الدولة"
+        title={`${selectedCountry.name} (${selectedCountry.dialCode})`}
       >
-        <span className="text-base leading-none">{selectedCountry.flag}</span>
+        {/* Country Flag Image */}
+        <CountryFlag country={selectedCountry} />
         <ChevronDown
           className={cn(
             "size-3 text-dark-600 transition-transform duration-200",
             open && "rotate-180"
           )}
         />
-        <span className="text-sm font-medium text-white ml-0.5">
+        {/* Country Dial Code - tied to the country flag */}
+        <span className="text-sm font-medium text-white ml-0.5 font-mono">
           {selectedCountry.dialCode}
         </span>
       </PopoverTrigger>
       <PopoverContent
-        className="w-72 p-0 bg-dark-400 border-dark-500 text-white shadow-2xl z-50 rounded-lg overflow-hidden"
+        className="w-80 p-0 bg-dark-400 border-dark-500 text-white shadow-2xl z-50 rounded-lg overflow-hidden"
         align="start"
       >
         <Command className="bg-dark-400 text-white">
           <CommandInput
-            placeholder="ابحث عن دولة أو رمز (+)..."
+            placeholder="ابحث عن دولة أو مفتاح الدولة (+)..."
             className="text-sm text-white placeholder:text-dark-600"
           />
-          <CommandList className="max-h-56 overflow-y-auto">
+          <CommandList className="max-h-60 overflow-y-auto">
             <CommandEmpty className="py-6 text-center text-sm text-dark-600">
               لم يتم العثور على دولة
             </CommandEmpty>
@@ -161,15 +235,19 @@ export function CountrySelector({
                       onSelectCountry(c);
                       setOpen(false);
                     }}
-                    className="flex items-center justify-between gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-dark-500 text-white aria-selected:bg-dark-500"
+                    className={cn(
+                      "flex items-center justify-between gap-2.5 px-3 py-2 text-sm cursor-pointer hover:bg-dark-500 text-white aria-selected:bg-dark-500 transition-colors",
+                      isSelected && "bg-dark-500/60"
+                    )}
                   >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className="text-base">{c.flag}</span>
+                    <div className="flex items-center gap-2.5 truncate">
+                      {/* Flag Image in dropdown item */}
+                      <CountryFlag country={c} />
                       <span className="truncate">{c.name}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span
-                        className="text-xs text-dark-600 font-mono"
+                        className="text-xs text-dark-600 font-mono font-medium"
                         dir="ltr"
                       >
                         {c.dialCode}
@@ -190,7 +268,7 @@ export function CountrySelector({
 }
 
 // ==========================================
-// 3. FILE UPLOAD DROPZONE COMPONENT
+// 5. FILE UPLOAD DROPZONE COMPONENT
 // ==========================================
 interface FileUploadDropzoneProps {
   value?: File | File[] | string | null;
@@ -311,7 +389,7 @@ function FileUploadDropzone({
 }
 
 // ==========================================
-// 4. COMBOBOX DROPDOWN COMPONENT
+// 6. COMBOBOX DROPDOWN COMPONENT
 // ==========================================
 interface ComboboxFieldProps {
   value?: string;
@@ -416,7 +494,7 @@ function ComboboxField({
 }
 
 // ==========================================
-// 5. DATE PICKER FIELD COMPONENT
+// 7. DATE PICKER FIELD COMPONENT
 // ==========================================
 interface DatePickerFieldProps {
   value?: Date | string | null;
@@ -478,7 +556,7 @@ function DatePickerField({
 }
 
 // ==========================================
-// 6. CUSTOM FORM FIELD PROPS & MAIN COMPONENT
+// 8. CUSTOM FORM FIELD PROPS & MAIN COMPONENT
 // ==========================================
 export interface CustomFormFieldProps<T extends FieldValues = FieldValues> {
   control: Control<T>;
@@ -516,16 +594,9 @@ export default function CustomFormField<T extends FieldValues>({
 }: CustomFormFieldProps<T>) {
   // Reusable country state for PHONE_INPUT
   const [selectedCountry, setSelectedCountry] = useState<CountryOption>(() => {
-    const found = countries.find(
-      (c) => c.code.toLowerCase() === defaultCountry.toLowerCase()
-    );
+    const found = findCountryByCode(defaultCountry, countries);
     return found || countries[0] || DEFAULT_COUNTRIES[0];
   });
-
-  const handleCountryChange = (country: CountryOption) => {
-    setSelectedCountry(country);
-    onCountryChange?.(country);
-  };
 
   return (
     <Controller
@@ -535,6 +606,50 @@ export default function CustomFormField<T extends FieldValues>({
         const isEmail = name.toLowerCase().includes("email");
         const isPhone = fieldType === FormFieldType.PHONE_INPUT;
         const isLtr = isEmail || isPhone;
+
+        // Synchronize country selection if field.value starts with a country dial code
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+          if (isPhone && typeof field.value === "string" && field.value.startsWith("+")) {
+            // Match longest dial code
+            const matched = [...countries]
+              .sort((a, b) => b.dialCode.length - a.dialCode.length)
+              .find((c) => field.value.startsWith(c.dialCode));
+            if (matched && matched.code !== selectedCountry.code) {
+              setSelectedCountry(matched);
+              onCountryChange?.(matched);
+            }
+          }
+        }, [field.value, isPhone]);
+
+        // When a user selects a new country from the dropdown:
+        // Clear the phone number field so it is empty by default
+        const handleCountryChange = (newCountry: CountryOption) => {
+          setSelectedCountry(newCountry);
+          onCountryChange?.(newCountry);
+          field.onChange("");
+        };
+
+        // When the user types in the phone input:
+        // If they type/paste a dial code starting with '+', auto-detect and update the country flag and code
+        const handlePhoneInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+          const val = e.target.value;
+          if (val.startsWith("+")) {
+            const matched = [...countries]
+              .sort((a, b) => b.dialCode.length - a.dialCode.length)
+              .find((c) => val.startsWith(c.dialCode));
+            if (matched) {
+              if (matched.code !== selectedCountry.code) {
+                setSelectedCountry(matched);
+                onCountryChange?.(matched);
+              }
+              const localPart = val.slice(matched.dialCode.length).trim();
+              field.onChange(localPart);
+              return;
+            }
+          }
+          field.onChange(val);
+        };
 
         return (
           <Field
@@ -587,7 +702,7 @@ export default function CustomFormField<T extends FieldValues>({
                   );
 
                 // ----------------------------------------
-                // 2) PHONE_INPUT (With Reusable Country Selector)
+                // 2) PHONE_INPUT (With Reusable Country Flag & Dial Code Selector)
                 // ----------------------------------------
                 case FormFieldType.PHONE_INPUT:
                   return (
@@ -599,7 +714,7 @@ export default function CustomFormField<T extends FieldValues>({
                           : "border-dark-500 focus-within:border-zinc-400"
                       )}
                     >
-                      {/* Reusable Country Selector with Flag + Dial Code */}
+                      {/* Reusable Country Selector with Flag Image + Dial Code */}
                       <CountrySelector
                         selectedCountry={selectedCountry}
                         onSelectCountry={handleCountryChange}
@@ -609,10 +724,17 @@ export default function CustomFormField<T extends FieldValues>({
                       <Input
                         {...field}
                         value={field.value ?? ""}
+                        onChange={handlePhoneInputChange}
                         id={name}
                         type="tel"
                         dir="ltr"
-                        placeholder={placeholder ?? "10 1234 5678"}
+                        placeholder={
+                          placeholder !== undefined
+                            ? placeholder
+                            : selectedCountry.code === "EG"
+                            ? "10 1234 5678"
+                            : ""
+                        }
                         disabled={disabled}
                         autoComplete="tel"
                         className="h-full w-full border-0 bg-transparent px-0 py-0 text-sm text-white placeholder:text-dark-600 focus-visible:ring-0 focus-visible:border-0 shadow-none outline-none text-left"
