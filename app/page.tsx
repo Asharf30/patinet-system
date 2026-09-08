@@ -7,7 +7,7 @@ export default function Home() {
       {/* pesskey , Verification */}
 
       <section className="remove-scrollbar container my-auto">
-        <div className="sub-container max-w-\[496px\]">
+        <div className="sub-container max-w-[496px]">
           <Image
             src="/icons/ok.svg"
             alt="image"

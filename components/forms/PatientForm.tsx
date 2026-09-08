@@ -15,6 +15,7 @@ import {
 } from "@/components/forms/CustomFormField";
 import { UserFormValidation } from "@/lib/Validtion";
 import { useRouter } from "next/navigation";
+import { createUser } from "@/lib/actions/patient.actions";
 
 type PatientFormValues = z.infer<typeof UserFormValidation>;
 
@@ -42,14 +43,14 @@ const PatientForm = ({ className }: PatientFormProps = {}) => {
     setIsLoading(true);
 
     try {
-      // const userData = {
-      //   name,
-      //   email,
-      //   phone: selectedCountry.dialCode + phone,
-      // };
-      // const user = await createUser(userData);
+      const userData = {
+        name,
+        email,
+        phone: selectedCountry.dialCode + phone,
+      };
+      const user = await createUser(userData);
 
-      // if (user) router.push(`/patient/${user.id}`);
+      if (user) router.push(`/patient/${user.$id}`);
     } catch (error) {
       console.error("Error creating user:", error);
     }
